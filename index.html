@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FirstFiveBooth ✨</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">📸</span>
+        <span class="logo-text">FirstFive<span class="logo-accent">Booth</span></span>
+      </div>
+      <p class="tagline">Strike a pose. Match the character. Capture the moment.</p>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════ MAIN APP ═══════════════════════════ -->
+  <main id="app">
+
+    <!-- ─── SCREEN: WELCOME ─── -->
+    <section id="screen-welcome" class="screen active">
+      <div class="welcome-card">
+        <div class="welcome-emoji">🎭</div>
+        <h1>Ready to Strike a Pose?</h1>
+        <p class="welcome-desc">
+          Match three character poses, snap your best shots, and get a beautiful photobooth strip — all in your browser!
+        </p>
+        <div class="welcome-gallery" aria-label="Photobooth pose examples">
+          <img src="Pic1.jpg" alt="Friends posing together" />
+          <img src="pic2.jpg" alt="Two characters posing together" />
+          <img src="pic3.jpg" alt="Three bears posing together" />
+        </div>
+        <div class="welcome-steps">
+          <div class="step"><span class="step-num">1</span><span>Pick a pose</span></div>
+          <div class="step-arrow">→</div>
+          <div class="step"><span class="step-num">2</span><span>Match it</span></div>
+          <div class="step-arrow">→</div>
+          <div class="step"><span class="step-num">3</span><span>Capture × 3</span></div>
+          <div class="step-arrow">→</div>
+          <div class="step"><span class="step-num">4</span><span>Download strip</span></div>
+        </div>
+        <button id="btn-start" class="btn btn-primary btn-large">
+          <span>✨ Start Photobooth</span>
+        </button>
+        <p class="camera-note">📷 Camera access required — stay on <strong>localhost</strong> or <strong>https://</strong></p>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: CAPTURE ─── -->
+    <section id="screen-capture" class="screen">
+
+      <!-- Progress bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-dots">
+          <div class="pdot" id="pdot-1" data-label="Photo 1"></div>
+          <div class="pdot" id="pdot-2" data-label="Photo 2"></div>
+          <div class="pdot" id="pdot-3" data-label="Photo 3"></div>
+        </div>
+        <p id="progress-label" class="progress-label">PHOTO 1 / 3</p>
+      </div>
+
+      <!-- Capture stage -->
+      <div class="capture-stage">
+
+        <!-- Reference panel -->
+        <div class="panel panel-reference">
+          <div class="panel-header">
+            <span class="panel-title">🎯 Reference Pose</span>
+            <div class="pose-controls">
+              <button id="btn-random-pose" class="btn btn-sm btn-ghost" title="Random pose">🔀 Random</button>
+              <label class="btn btn-sm btn-ghost" title="Upload your own">
+                📁 Upload
+                <input type="file" id="upload-pose" accept="image/*" hidden />
+              </label>
+            </div>
+          </div>
+          <div class="reference-frame" id="reference-frame">
+            <img id="reference-img" src="" alt="Reference pose" />
+            <div id="ref-error" class="ref-error hidden">⚠️ Image failed to load</div>
+          </div>
+          <p id="pose-name" class="pose-name">Loading pose…</p>
+        </div>
+
+        <!-- Camera panel -->
+        <div class="panel panel-camera">
+          <div class="panel-header">
+            <span class="panel-title">📹 Your Camera</span>
+            <div class="camera-controls-top">
+              <span id="detection-badge" class="badge badge-loading">⏳ Loading AI…</span>
+            </div>
+          </div>
+          <div class="camera-frame" id="camera-frame">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="pose-canvas"></canvas><!-- skeleton overlay -->
+
+            <!-- Countdown overlay -->
+            <div id="countdown-overlay" class="countdown-overlay hidden">
+              <span id="countdown-number" class="countdown-number">3</span>
+            </div>
+
+            <!-- Flash overlay -->
+            <div id="flash-overlay" class="flash-overlay hidden"></div>
+
+            <!-- Camera error -->
+            <div id="camera-error" class="camera-error hidden">
+              <span class="camera-error-icon">🚫</span>
+              <p>Camera access denied or unavailable.</p>
+              <p class="small">Please allow camera access in your browser settings, then reload the page.</p>
+            </div>
+
+            <!-- Camera loading -->
+            <div id="camera-loading" class="camera-loading">
+              <div class="spinner"></div>
+              <p>Starting camera…</p>
+            </div>
+          </div>
+
+          <!-- Pose match indicator -->
+          <div id="match-section" class="match-section hidden">
+            <div class="match-bar-wrap">
+              <div class="match-bar-track">
+                <div id="match-bar" class="match-bar"></div>
+              </div>
+              <span id="match-pct" class="match-pct">0%</span>
+            </div>
+            <p id="match-hint" class="match-hint">Position yourself in frame…</p>
+          </div>
+
+          <!-- Capture controls -->
+          <div class="capture-controls">
+            <div class="capture-mode-tabs">
+              <button id="mode-countdown" class="mode-tab active" title="Countdown mode">⏱ Countdown</button>
+              <button id="mode-pose" class="mode-tab" title="Auto-capture when pose matches">🤖 Pose Match</button>
+            </div>
+            <button id="btn-capture" class="btn btn-capture" title="Capture photo">
+              <span class="capture-ring"></span>
+              <span class="capture-inner"></span>
+            </button>
+            <p id="capture-hint" class="capture-hint">Click to start countdown</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: REVIEW ─── -->
+    <section id="screen-review" class="screen">
+      <h2 class="section-title">📋 Review Your Photos</h2>
+      <p class="section-sub">Happy with all three? Continue to create your strip, or retake any photo.</p>
+
+      <div class="review-grid" id="review-grid">
+        <!-- Cards injected by JS -->
+      </div>
+
+      <div class="review-actions">
+        <button id="btn-continue-collage" class="btn btn-primary">✨ Create Collage Strip</button>
+        <button id="btn-restart" class="btn btn-ghost">🔄 Start Again</button>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: COLLAGE ─── -->
+    <section id="screen-collage" class="screen">
+      <h2 class="section-title">🎉 Your Photobooth Strip!</h2>
+      <p class="section-sub">Choose a style and download your strip.</p>
+
+      <!-- Layout pickers -->
+      <div class="layout-picker">
+        <button class="layout-btn active" data-theme="classic" style="--c:#fff;">
+          <span class="layout-swatch" style="background:#fff; border:2px solid #ddd;"></span>Classic White
+        </button>
+        <button class="layout-btn" data-theme="dark" style="--c:#1a1a2e;">
+          <span class="layout-swatch" style="background:#1a1a2e;"></span>Minimal Dark
+        </button>
+        <button class="layout-btn" data-theme="pastel" style="--c:#fce4ec;">
+          <span class="layout-swatch" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);"></span>Pastel Dream
+        </button>
+      </div>
+
+      <!-- Canvas preview -->
+      <div class="collage-preview-wrap">
+        <canvas id="collage-canvas" class="collage-canvas"></canvas>
+      </div>
+
+      <!-- Download actions -->
+      <div class="collage-actions">
+        <button id="btn-dl-png" class="btn btn-primary">⬇️ Download PNG</button>
+        <button id="btn-dl-jpg" class="btn btn-secondary">⬇️ Download JPG</button>
+        <button id="btn-retake-photos" class="btn btn-ghost">🔁 Retake Photos</button>
+        <button id="btn-new-session" class="btn btn-ghost">✨ New Session</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+  <footer class="site-footer">
+    <p>FirstFiveBooth &mdash; All photos stay in your browser. Nothing is uploaded.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
